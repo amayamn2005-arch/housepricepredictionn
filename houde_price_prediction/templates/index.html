@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>House Price Predictor</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+    <main class="page-container">
+
+        <header class="hero">
+            <div class="brand-mark">HP</div>
+
+            <p class="eyebrow">PROPERTY ESTIMATION</p>
+
+            <h1>House Price Predictor</h1>
+
+            <p class="hero-description">
+                Discover an estimated property value using location
+                and essential house details.
+            </p>
+        </header>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">YOUR PROPERTY</p>
+                    <h2>Enter house details</h2>
+                    <p class="muted">
+                        Complete the fields below to estimate the price.
+                    </p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('home') }}">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label for="location">Location</label>
+                        <select id="location" name="location" required>
+                            {% for location in locations %}
+                            <option
+                                value="{{ location }}"
+                                {% if form_data.location == location %}
+                                selected
+                                {% endif %}
+                            >
+                                {{ location }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="area">Area (sq. ft.)</label>
+                        <input
+                            id="area"
+                            type="number"
+                            name="area"
+                            min="0.01"
+                            step="any"
+                            placeholder="e.g. 1200"
+                            value="{{ form_data.area }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="bedrooms">Bedrooms</label>
+                        <input
+                            id="bedrooms"
+                            type="number"
+                            name="bedrooms"
+                            min="1"
+                            step="1"
+                            placeholder="e.g. 3"
+                            value="{{ form_data.bedrooms }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="bathrooms">Bathrooms</label>
+                        <input
+                            id="bathrooms"
+                            type="number"
+                            name="bathrooms"
+                            min="1"
+                            step="1"
+                            placeholder="e.g. 2"
+                            value="{{ form_data.bathrooms }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="field field-full">
+                        <label for="age">House age (years)</label>
+                        <input
+                            id="age"
+                            type="number"
+                            name="age"
+                            min="0"
+                            step="1"
+                            placeholder="e.g. 5"
+                            value="{{ form_data.age }}"
+                            required
+                        >
+                        <small>
+                            Enter 0 for a newly built house.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="button-row">
+                    <button
+                        class="button button-primary"
+                        type="submit"
+                        name="action"
+                        value="predict"
+                    >
+                        Predict House Price
+                    </button>
+
+                    <button
+                        class="button button-secondary"
+                        type="submit"
+                        name="action"
+                        value="clear"
+                        formnovalidate
+                    >
+                        Clear Details
+                    </button>
+                </div>
+
+            </form>
+
+            {% if error %}
+            <div class="message error" role="alert">
+                <strong>Unable to predict</strong>
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
+
+            {% if prediction is not none and details %}
+            <section class="result-card" aria-live="polite">
+                <p class="result-label">ESTIMATED HOUSE PRICE</p>
+
+                <h2 class="price">
+                    ₹{{ "{:,.0f}".format(prediction) }}
+                </h2>
+
+                <p class="result-note">
+                    Estimated value based on the supplied property details.
+                </p>
+
+                <div class="result-divider"></div>
+
+                <h3>Property Summary</h3>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span>Location</span>
+                        <strong>{{ details.location }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Area</span>
+                        <strong>{{ details.area }} sq. ft.</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Bedrooms</span>
+                        <strong>{{ details.bedrooms }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>Bathrooms</span>
+                        <strong>{{ details.bathrooms }}</strong>
+                    </div>
+
+                    <div class="detail-item">
+                        <span>House age</span>
+                        <strong>
+                            {{ details.age }}
+                            {% if details.age == 1 %}year{% else %}years{% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <p class="disclaimer">
+                Note: This is an estimate generated from the available
+                sample dataset, not an official property valuation.
+            </p>
+        </section>
+
+    </main>
+</body>
+</html>
